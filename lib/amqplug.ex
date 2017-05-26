@@ -1,18 +1,7 @@
 defmodule Amqplug do
-  @moduledoc """
-  Documentation for Amqplug.
-  """
+  use Application
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Amqplug.hello
-      :world
-
-  """
-  def hello do
-    :world
+  def start(_type, _args) do
+    Amqplug.Supervisor.start_link()
   end
 end
