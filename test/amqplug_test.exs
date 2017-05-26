@@ -1,0 +1,8 @@
+defmodule AmqplugTest do
+  use ExUnit.Case
+  doctest Amqplug
+
+  test "the truth" do
+    assert 1 + 1 == 2
+  end
+end
