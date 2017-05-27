@@ -1,22 +1,19 @@
-defmodule Amqplug.Adapters.Rabbit.Subscriber do
+defmodule Amqplug.Adapters.Rabbit.Listener do
   use GenServer
   use AMQP
+  
+  alias Amqplug.Adapters.Rabbit.Task
 
-  @url "amqp://guest:guest@localhost"
-  @exchange "world"
-  @queue "#"
-
-  def start_link(route) do 
-    GenServer.start(__MODULE__, [route], [])
+  def start_link(conn, queue) do 
+    GenServer.start(__MODULE__, {conn, queue, nil}, [])
   end
 
-  def init([route]) do
-    {:ok, conn} = Connection.open(@url)
+  def init({conn, {exchange, queue_name, routing_key} = queue, _}) do
     {:ok, chan} = Channel.open(conn)
-    Queue.declare(chan, @queue, auto_delete: true)
-    Queue.bind(chan, @queue, @exchange, routing_key: route)
-    {:ok, _consumer_tag} = Basic.consume(chan, @queue)
-    {:ok, {chan, @exchange}}
+    Queue.declare(chan, queue_name, auto_delete: true)
+    Queue.bind(chan, queue_name, exchange, routing_key: routing_key)
+    {:ok, _consumer_tag} = Basic.consume(chan, queue_name)
+    {:ok, {conn, queue, chan}}
   end
 
   # Confirmation sent by the broker after registering this process as a consumer
@@ -34,8 +31,8 @@ defmodule Amqplug.Adapters.Rabbit.Subscriber do
     {:noreply, state}
   end
 
-  def handle_info({:basic_deliver, payload, meta}, {chan, exchange} = state) do
-    task = Amqplug.Adapters.Rabbit.Task.task(chan, payload, meta, exchange)
+  def handle_info({:basic_deliver, payload, meta}, {_, {exchange, _, _}, chan} = state) do
+    task = Task.task(chan, payload, meta, exchange)
     IO.inspect task
     IO.puts "============================================================="
     {:noreply, state}

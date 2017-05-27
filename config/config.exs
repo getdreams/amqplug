@@ -21,6 +21,10 @@ use Mix.Config
 #     config :logger, level: :info
 #
 config :amqplug, connect_options: "amqp://guest:guest@localhost"
+config :amqplug, queues: [
+  [{"world", "test_one", "1"}],
+  [{"world", "test_two", "2"}]
+]
 
 
 # It is also possible to import configuration files, relative to this
