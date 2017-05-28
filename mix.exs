@@ -16,8 +16,8 @@ defmodule Amqplug.Mixfile do
   def application do
     # Specify extra applications you'll use from Erlang/Elixir
     [
-      extra_applications: [:logger, :amqp],
-      mod: {Amqplug, []}
+      extra_applications: [:logger, :amqp]
+      #mod: {Amqplug, []}
     ]
   end
 

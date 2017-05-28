@@ -1,4 +1,5 @@
 defmodule Amqplug.Task do
+  require Logger
   defstruct adapter:      nil,
             state:        :received,
             in_channel:   nil,
@@ -38,7 +39,8 @@ defmodule Amqplug.Task do
   end
 
   defp publish_effects(adapter, channel, exchange, [{routing_key, payload} | tail]) do
-    {:ok} = adapter.publish(channel, exchange, routing_key, payload)
+    Logger.debug("#{__MODULE__} publishing: #{exchange} #{routing_key}, #{payload}")
+    adapter.publish(channel, exchange, routing_key, payload)
     publish_effects(adapter, channel, exchange, tail)
   end
 end

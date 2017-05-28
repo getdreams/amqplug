@@ -2,7 +2,7 @@ defmodule Amqplug.Adapters.Rabbit.Connection do
   use GenServer
   require Logger
   alias Amqplug.Config
-  alias Amqplug.Adapters.Rabbit.Listener
+  alias Amqplug.Adapters.Rabbit.Worker
 
   @reconnect_interval 5_000
   def start_link({host, _, _} = state) do
@@ -10,10 +10,9 @@ defmodule Amqplug.Adapters.Rabbit.Connection do
     GenServer.start_link(__MODULE__, state, name: __MODULE__)
   end
 
-  def start_link() do
+  def start_link(pipelines) do
     host = Config.get_host()
-    queues = Config.get_queues()
-    start_link({host, nil, queues})
+    start_link({host, nil, pipelines})
   end
 
   def init({_, conn, _} = state) do
@@ -21,17 +20,17 @@ defmodule Amqplug.Adapters.Rabbit.Connection do
     {:ok, state}
   end
 
-  def handle_info(:connect, {host, _, queues}) do
+  def handle_info(:connect, {host, _, pipelines}) do
     case do_connect(host) do
       {:ok, connection} -> 
         Logger.info("#{__MODULE__}: connected to broker at #{host}")
         Process.monitor(connection.pid)
-        setup_queues(connection, queues)
-        {:noreply, {host, connection, queues}}
+        setup_workers(connection, pipelines)
+        {:noreply, {host, connection, pipelines}}
       error -> 
         Logger.warn("#{__MODULE__}: failed to connect to broker at #{host}. Error: #{IO.inspect(error)}. Retrying in: #{@reconnect_interval} ms")
         Process.send_after(self(), :connect, @reconnect_interval)
-        {:noreply, {host, nil, queues}}
+        {:noreply, {host, nil, pipelines}}
     end
   end
 
@@ -40,9 +39,9 @@ defmodule Amqplug.Adapters.Rabbit.Connection do
     {:stop, {:connection_lost, reason}, {host, nil, []}}
   end
 
-  defp setup_queues(connection, queues) do
-    Enum.each(queues, fn([queue]) ->
-      {:ok, listener_pid} = Listener.start_link(connection, queue)
+  defp setup_workers(connection, pipelines) do
+    Enum.each(pipelines, fn(pipeline) ->
+      {:ok, listener_pid} = Worker.start_link(connection, pipeline)
       Process.link(listener_pid)
     end)
   end

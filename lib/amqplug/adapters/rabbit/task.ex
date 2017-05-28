@@ -1,12 +1,13 @@
 defmodule Amqplug.Adapters.Rabbit.Task do
-  def task(channel, payload, %{routing_key: routing_key, delivery_tag: delivery_tag}, exchange) do
+  def task(channel, payload, %{routing_key: routing_key, delivery_tag: delivery_tag}, exchange, out_channel) do
     %Amqplug.Task{
       adapter:      __MODULE__, 
       in_channel:   channel,
       routing_key:  routing_key,
       payload:      payload,
       delivery_tag: delivery_tag,
-      exchange:     exchange
+      exchange:     exchange,
+      out_channel:  out_channel
     }
   end
 
