@@ -1,12 +1,11 @@
-defmodule Amqplug.Adapters.Rabbit.Connection do
+defmodule Amqplug.Rabbit.Connection do
   use GenServer
   require Logger
   alias Amqplug.Config
-  alias Amqplug.Adapters.Rabbit.Worker
+  alias Amqplug.Rabbit.Worker
 
   @reconnect_interval 5_000
-  def start_link({host, _, _} = state) do
-    Logger.debug("#{__MODULE__}: start_link with broker at #{host}")
+  def start_link({_, _, _} = state) do
     GenServer.start_link(__MODULE__, state, name: __MODULE__)
   end
 

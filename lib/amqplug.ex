@@ -2,6 +2,6 @@ defmodule Amqplug do
   use Application
 
   def start(_type, _args) do
-    #Amqplug.Supervisor.start_link()
+    Amqplug.Rabbit.Supervisor.start_link(Amqplug.Config.get_routes)
   end
 end

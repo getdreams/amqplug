@@ -1,7 +1,7 @@
 # This is actually a worker, and it could have one more session for outboud messages, passed on to sub worker processes. 
 # When we handle a task, we kick off a new process and give it the plug pipeline
 # TODO: remove the heavy stuff from init
-defmodule Amqplug.Adapters.Rabbit.Worker do
+defmodule Amqplug.Rabbit.Worker do
   use GenServer
   use AMQP
   
@@ -34,7 +34,7 @@ defmodule Amqplug.Adapters.Rabbit.Worker do
   end
 
   def handle_info({:basic_deliver, payload, meta}, {plug, {exchange, _, _}, in_chan, out_chan} = state) do
-    task = Amqplug.Adapters.Rabbit.Task.task(
+    task = Amqplug.Rabbit.Task.task(
         in_chan, payload, meta, exchange, out_chan)
 
     Task.async(fn -> plug.call(task, nil) end)

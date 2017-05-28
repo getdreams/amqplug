@@ -7,9 +7,9 @@ defmodule Amqplug.Config do
     end
   end
 
-  def get_queues() do
-    case Application.fetch_env(:amqplug, :queues) do
-      {:ok, queues} -> queues
+  def get_routes() do
+    case Application.fetch_env(:amqplug, :routes) do
+      {:ok, routes} -> routes
       _ -> nil
     end
   end
