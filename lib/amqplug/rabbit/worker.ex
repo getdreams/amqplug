@@ -5,8 +5,8 @@ defmodule Amqplug.Rabbit.Worker do
   use GenServer
   use AMQP
   
-  def start_link(conn, {queue, plug}) do 
-    GenServer.start(__MODULE__, {conn, queue, plug}, [])
+  def start_link(conn, {{_, queue_name, _} = queue, plug}) do 
+    GenServer.start(__MODULE__, {conn, queue, plug}, name: String.to_atom(queue_name))
   end
 
   def init({conn, {exchange, queue_name, routing_key} = queue, plug}) do

@@ -1,8 +1,6 @@
 defmodule Amqplug.Rabbit.Connection do
   use GenServer
   require Logger
-  alias Amqplug.Config
-  alias Amqplug.Rabbit.Worker
 
   @reconnect_interval 5_000
   def start_link({_, _, _} = state) do
@@ -10,7 +8,7 @@ defmodule Amqplug.Rabbit.Connection do
   end
 
   def start_link(pipelines) do
-    host = Config.get_host()
+    host = Amqplug.Config.host()
     start_link({host, nil, pipelines})
   end
 
@@ -40,7 +38,7 @@ defmodule Amqplug.Rabbit.Connection do
 
   defp setup_workers(connection, pipelines) do
     Enum.each(pipelines, fn(pipeline) ->
-      {:ok, listener_pid} = Worker.start_link(connection, pipeline)
+      {:ok, listener_pid} = Amqplug.Rabbit.Worker.start_link(connection, pipeline)
       Process.link(listener_pid)
     end)
   end

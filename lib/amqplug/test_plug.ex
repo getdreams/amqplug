@@ -11,5 +11,6 @@ defmodule Amqplug.Testplug do
     |> add_effect({"some.route", "some.payload"}) 
     |> add_effect({"another.route", "another.payload"}) 
     |> publish_effects
+    :timer.sleep(5000)
   end
 end
