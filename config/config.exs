@@ -20,7 +20,7 @@ use Mix.Config
 #
 #     config :logger, level: :info
 #
-config :amqplug, connect_options: "amqp://guest:guest@localhost"
+config :amqplug, host: "amqp://guest:guest@localhost"
 config :amqplug, routes:
 [
   {{"world", "test_queue_one", "router_one"}, Amqplug.Testplug},

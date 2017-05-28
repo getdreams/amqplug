@@ -1,6 +1,6 @@
 defmodule Amqplug.Config do
   def host() do
-    case Application.fetch_env(:amqplug, :connect_options) do
+    case Application.fetch_env(:amqplug, :host) do
       {:ok, host} -> host 
       _ -> nil
     end
