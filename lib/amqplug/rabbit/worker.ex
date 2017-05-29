@@ -37,7 +37,7 @@ defmodule Amqplug.Rabbit.Worker do
     task = Amqplug.Rabbit.Task.task(
         in_chan, payload, meta, exchange, out_chan)
 
-    Task.async(fn -> plug.call(task, nil) end)
+    Task.async(fn -> plug.call(task, plug.init([])) end)
 
     {:noreply, state}
   end
