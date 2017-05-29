@@ -31,6 +31,7 @@ defmodule Amqplug.Mixfile do
 
   defp package do
     %{licenses: ["Apache 2"],
-      maintainers: ["Kiril Videlov"]}
+      maintainers: ["Kiril Videlov"],
+      links: %{"GitHub" => "https://github.com/krlvi/amqplug"}}
   end
 end
