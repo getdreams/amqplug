@@ -8,7 +8,7 @@ defmodule Amqplug.Supervisor do
 
     children = [
       worker(Amqplug.Rabbit.Connection, [pipelines], [id: make_ref()]),
-      worker(Amqplug.Manager, [], [id: make_ref()])
+      worker(Amqplug.EventDispatcher, [], [id: make_ref()])
     ]
     supervise(children, strategy: :one_for_one)
   end

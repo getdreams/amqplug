@@ -1,4 +1,4 @@
-defmodule Amqplug.Task do
+defmodule Amqplug.Event do
   require Logger
   defstruct adapter:      nil,
             state:        :received,
@@ -10,29 +10,29 @@ defmodule Amqplug.Task do
             exchange:     nil,
             effects:      []
 
-  alias Amqplug.Task
+  alias Amqplug.Event
 
-  def send_ack(%Task{adapter: adapter, in_channel: channel, delivery_tag: delivery_tag} = task) do
+  def send_ack(%Event{adapter: adapter, in_channel: channel, delivery_tag: delivery_tag} = event) do
     {:ok, _} = adapter.ack(channel, delivery_tag)
-    %{task | state: :acked}
+    %{event | state: :acked}
   end
 
-  def send_nack(%Task{adapter: adapter, in_channel: channel, delivery_tag: delivery_tag} = task) do
+  def send_nack(%Event{adapter: adapter, in_channel: channel, delivery_tag: delivery_tag} = event) do
     {:ok, _} = adapter.nack(channel, delivery_tag)
-    %{task | state: :nacked}
+    %{event | state: :nacked}
   end
 
-  def add_effect(%Task{effects: effects} = task, {_routing_key, _payload} = new_effect) do
-    %{task | effects: [new_effect | effects]}
+  def add_effect(%Event{effects: effects} = event, {_routing_key, _payload} = new_effect) do
+    %{event | effects: [new_effect | effects]}
   end
 
-  def set_out_channel(%Task{} = task, channel) do
-    %{task | out_channel: channel}
+  def set_out_channel(%Event{} = event, channel) do
+    %{event | out_channel: channel}
   end
 
-  def publish_effects(%Task{adapter: adapter, out_channel: channel, exchange: exchange, effects: effects} = task) do
+  def publish_effects(%Event{adapter: adapter, out_channel: channel, exchange: exchange, effects: effects} = event) do
     publish_effects(adapter, channel, exchange, effects)
-    %{task | state: :effects_published}
+    %{event | state: :effects_published}
   end
 
   defp publish_effects(_, _, _, []) do

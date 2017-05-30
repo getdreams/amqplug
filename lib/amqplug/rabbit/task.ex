@@ -1,6 +1,6 @@
-defmodule Amqplug.Rabbit.Task do
-  def task(channel, payload, %{routing_key: routing_key, delivery_tag: delivery_tag}, exchange, out_channel) do
-    %Amqplug.Task{
+defmodule Amqplug.Rabbit.Event do
+  def event(channel, payload, %{routing_key: routing_key, delivery_tag: delivery_tag}, exchange, out_channel) do
+    %Amqplug.Event{
       adapter:      __MODULE__, 
       in_channel:   channel,
       routing_key:  routing_key,

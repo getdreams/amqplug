@@ -1,21 +1,21 @@
 #more complicated logic here in teh future
-defmodule Amqplug.Manager do
+defmodule Amqplug.EventDispatcher do
   use GenServer
 
   def start_link() do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  def process_task_with_plug(task, plug) do
-    GenServer.cast(__MODULE__, {:work, {task, plug}})
+  def dispatch_event(event, plug) do
+    GenServer.cast(__MODULE__, {:work, {event, plug}})
   end
 
   def init() do
     {:ok, []}
   end
   
-  def handle_cast({:work, {task, plug}}, state) do
-    Task.async(fn -> plug.call(task, plug.init([])) end)
+  def handle_cast({:work, {event, plug}}, state) do
+    Task.async(fn -> plug.call(event, plug.init([])) end)
     {:noreply, state}
   end
 

@@ -34,18 +34,15 @@ defmodule Amqplug.Rabbit.Worker do
   end
 
   def handle_info({:basic_deliver, payload, meta}, {plug, {exchange, _, _}, in_chan, out_chan} = state) do
-    task = Amqplug.Rabbit.Task.task(
+    event = Amqplug.Rabbit.Event.event(
         in_chan, payload, meta, exchange, out_chan)
 
-    #Amqplug.Supervisor.start_child(task, plug)
-    Amqplug.Manager.process_task_with_plug(task, plug)
-
-    #Task.async(fn -> plug.call(task, plug.init([])) end)
+    Amqplug.EventDispatcher.dispatch_event(event, plug)
 
     {:noreply, state}
   end
 
-  #when a task is reaady
+  # remove?
   def handle_info(_ref, state) do
     {:noreply, state}
   end

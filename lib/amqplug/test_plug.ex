@@ -1,12 +1,12 @@
 defmodule Amqplug.Testplug do
-  import Amqplug.Task
+  import Amqplug.Event
 
   def init(options) do
     options
   end
 
-  def call(task, _options) do
-    task
+  def call(event, _options) do
+    event
     |> send_ack
     |> add_effect({"some.route", "some.payload"}) 
     |> add_effect({"another.route", "another.payload"}) 
