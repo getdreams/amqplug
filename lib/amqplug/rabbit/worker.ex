@@ -1,6 +1,5 @@
 # This is actually a worker, and it could have one more session for outboud messages, passed on to sub worker processes. 
 # When we handle a task, we kick off a new process and give it the plug pipeline
-# TODO: remove the heavy stuff from init
 defmodule Amqplug.Rabbit.Worker do
   use GenServer
   use AMQP
@@ -9,13 +8,20 @@ defmodule Amqplug.Rabbit.Worker do
     GenServer.start(__MODULE__, {conn, queue, plug}, name: String.to_atom(queue_name))
   end
 
-  def init({conn, {exchange, queue_name, routing_key} = queue, plug}) do
-    {:ok, in_chan} = Channel.open(conn)
-    {:ok, out_chan} = Channel.open(conn)
+  def init({conn, queue, plug}) do
+    send(self(), {:setup, conn})
+    {:ok, {plug, queue, nil, nil}}
+  end
+
+  def handle_info({:setup, conn}, {plug, {exchange, queue_name, routing_key} = queue, _, _}) do
+    {:ok, %AMQP.Channel{pid: in_chan_pid} = in_chan} = Channel.open(conn)
+    {:ok, %AMQP.Channel{pid: out_chan_pid} = out_chan} = Channel.open(conn)
+    Process.monitor(in_chan_pid)
+    Process.monitor(out_chan_pid)
     Queue.declare(in_chan, queue_name, auto_delete: true)
     Queue.bind(in_chan, queue_name, exchange, routing_key: routing_key)
     {:ok, _consumer_tag} = Basic.consume(in_chan, queue_name)
-    {:ok, {plug, queue, in_chan, out_chan}}
+    {:noreply, {plug, queue, in_chan, out_chan}}
   end
 
   # Confirmation sent by the broker after registering this process as a consumer
@@ -43,7 +49,9 @@ defmodule Amqplug.Rabbit.Worker do
   end
 
   # remove?
-  def handle_info(_ref, state) do
+  def handle_info(ref, state) do
+    IO.puts "Got into catch all function"
+    IO.inspect ref
     {:noreply, state}
   end
 end
