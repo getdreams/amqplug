@@ -24,4 +24,8 @@ defmodule Amqplug.Rabbit.Event do
   def publish(channel, exchange, routing_key, payload) do
     AMQP.Basic.publish(channel, exchange, routing_key, payload)
   end
+
+  def publish(channel, exchange, routing_key, payloada, opts) do
+    AMQP.Basic.publish(channel, exchange, routing_key, payload, opts)
+  end
 end

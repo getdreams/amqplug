@@ -1,5 +1,6 @@
 defmodule Amqplug.Event do
   require Logger
+  require Poison
   defstruct adapter:      nil,
             state:        :received,
             in_channel:   nil,
@@ -26,8 +27,26 @@ defmodule Amqplug.Event do
     %{event | effects: [new_effect | effects]}
   end
 
+  def add_effect(%Event{effects: effects} = event, {_routing_key, _payload, _opts} = new_effect) do
+    %{event | effects: [new_effect | effects]}
+  end
+
   def set_out_channel(%Event{} = event, channel) do
     %{event | out_channel: channel}
+  end
+
+  def decode_json_payload(%Amqplug.Event{payload: payload} = event) do
+    case Poison.decode(payload) do
+      {:ok, parsed} ->
+        %{event | payload: parsed}
+      _ ->
+        %{event | payload: payload}
+    end
+  end
+
+  def log_inbound(%Amqplug.Event{payload: payload} = event) do
+    Logger.debug("#{inspect payload}")
+    event
   end
 
   def publish_effects(%Event{adapter: adapter, out_channel: channel, exchange: exchange, effects: effects} = event) do
@@ -38,9 +57,9 @@ defmodule Amqplug.Event do
   defp publish_effects(_, _, _, []) do
   end
 
-  defp publish_effects(adapter, channel, exchange, [{routing_key, payload} | tail]) do
+  defp publish_effects(adapter, channel, exchange, [{routing_key, payload, opts \\ []} | tail]) do
     Logger.debug("#{__MODULE__} publishing: #{exchange} #{routing_key}, #{payload}")
-    adapter.publish(channel, exchange, routing_key, payload)
+    adapter.publish(channel, exchange, routing_key, payload, opts)
     publish_effects(adapter, channel, exchange, tail)
   end
 end
