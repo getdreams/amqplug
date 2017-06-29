@@ -54,6 +54,14 @@ defmodule Amqplug.Event do
     %{event | state: :effects_published}
   end
 
+  def publish_single(%Event{adapter: adapter, out_channel: channel, exchange: exchange}, {routing_key, payload}) do
+    adapter.publish(channel, exchange, routing_key, payload)
+  end
+
+  def publish_single(%Event{adapter: adapter, out_channel: channel, exchange: exchange}, {routing_key, payload, opts}) do
+    adapter.publish(channel, exchange, routing_key, payload, opts)
+  end
+
   defp publish_effects(_, _, _, []) do
   end
 
