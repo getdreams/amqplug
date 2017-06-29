@@ -57,9 +57,16 @@ defmodule Amqplug.Event do
   defp publish_effects(_, _, _, []) do
   end
 
-  defp publish_effects(adapter, channel, exchange, [{routing_key, payload, opts \\ []} | tail]) do
-    Logger.debug("#{__MODULE__} publishing: #{exchange} #{routing_key}, #{payload}")
-    adapter.publish(channel, exchange, routing_key, payload, opts)
-    publish_effects(adapter, channel, exchange, tail)
+  defp publish_effects(adapter, channel, exchange, [ head | tail ]) do
+    case head do
+      {routing_key, payload} -> 
+        Logger.debug("#{__MODULE__} publishing: #{exchange} #{routing_key}, #{payload}")
+        adapter.publish(channel, exchange, routing_key, payload)
+        publish_effects(adapter, channel, exchange, tail)
+      {routing_key, payload, opts} -> 
+        Logger.debug("#{__MODULE__} publishing: #{exchange} #{routing_key}, #{payload}")
+        adapter.publish(channel, exchange, routing_key, payload, opts)
+        publish_effects(adapter, channel, exchange, tail)
+    end
   end
 end
