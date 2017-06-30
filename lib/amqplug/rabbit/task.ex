@@ -1,9 +1,10 @@
 defmodule Amqplug.Rabbit.Event do
-  def event(channel, payload, %{routing_key: routing_key, delivery_tag: delivery_tag}, exchange, out_channel) do
+  def event(channel, payload, %{routing_key: routing_key, delivery_tag: delivery_tag, headers: headers}, exchange, out_channel) do
     %Amqplug.Event{
       adapter:      __MODULE__, 
       in_channel:   channel,
       routing_key:  routing_key,
+      headers:      headers,
       payload:      payload,
       delivery_tag: delivery_tag,
       exchange:     exchange,

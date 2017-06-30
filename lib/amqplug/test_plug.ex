@@ -7,14 +7,27 @@ defmodule Amqplug.Testplug do
 
   def call(event, _options) do
     event
+    |> publish_single({"futures.list", "single no header"})
+
+    :timer.sleep(1000)
+    event
+    |> publish_single({"futures.list", "single with header", headers: [{"reference", "ref"}] })
+
+    :timer.sleep(1000)
+    
+    event
+    |> publish_single({"futures.list", "single with two headers", headers: [{"reference", "ref"}, {"key", "val"}] })
+
+    :timer.sleep(1000)
+    event
     |> send_ack
-    |> add_effect({"some.route", "BEFORE"})
+    |> add_effect({"futures.list", "add no header"})
     |> publish_effects
-    :timer.sleep(30000)
+    :timer.sleep(1000)
 
     event
-    |> add_effect({"some.route", "AFTER"})
+    |> add_effect({"futures.list", "add with header", headers: [{"reference", "ref"}]})
     |> publish_effects
-    :timer.sleep(30000)
+    :timer.sleep(1000)
   end
 end

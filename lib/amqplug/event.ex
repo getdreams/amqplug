@@ -5,6 +5,7 @@ defmodule Amqplug.Event do
             state:        :received,
             in_channel:   nil,
             routing_key:  nil,
+            headers:      nil,
             payload:      nil,
             delivery_tag: nil,
             out_channel:  nil,
@@ -55,10 +56,12 @@ defmodule Amqplug.Event do
   end
 
   def publish_single(%Event{adapter: adapter, out_channel: channel, exchange: exchange}, {routing_key, payload}) do
+    Logger.debug("#{__MODULE__} publishing: #{exchange} #{routing_key}, #{payload}")
     adapter.publish(channel, exchange, routing_key, payload)
   end
 
   def publish_single(%Event{adapter: adapter, out_channel: channel, exchange: exchange}, {routing_key, payload, opts}) do
+    Logger.debug("#{__MODULE__} publishing: #{exchange} #{routing_key}, #{payload}")
     adapter.publish(channel, exchange, routing_key, payload, opts)
   end
 
