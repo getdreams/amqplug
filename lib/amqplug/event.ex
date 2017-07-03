@@ -80,4 +80,24 @@ defmodule Amqplug.Event do
         publish_effects(adapter, channel, exchange, tail)
     end
   end
+
+  def get_header(%Event{headers: headers}, header_key) do
+    case headers do
+      [] -> {:error}
+      headers ->
+        get_specific_header(headers, header_key)
+    end
+  end
+
+  defp get_specific_header(headers, header_key) do
+    reference =
+      Enum.filter(headers, fn({key, _, _}) -> key == header_key end)
+      |> Enum.map(fn({_, _, ref_value}) -> ref_value end)
+      |> List.first
+    case reference do
+      [] -> {:error}
+      nil -> {:error}
+      _ -> {:ok, reference}
+    end
+  end
 end
