@@ -55,14 +55,16 @@ defmodule Amqplug.Event do
     %{event | state: :effects_published}
   end
 
-  def publish_single(%Event{adapter: adapter, out_channel: channel, exchange: exchange}, {routing_key, payload}) do
+  def publish_single(%Event{adapter: adapter, out_channel: channel, exchange: exchange} = event, {routing_key, payload}) do
     Logger.debug("#{__MODULE__} publishing: #{exchange} #{routing_key}, #{payload}")
     adapter.publish(channel, exchange, routing_key, payload)
+    event
   end
 
-  def publish_single(%Event{adapter: adapter, out_channel: channel, exchange: exchange}, {routing_key, payload, opts}) do
+  def publish_single(%Event{adapter: adapter, out_channel: channel, exchange: exchange} = event, {routing_key, payload, opts}) do
     Logger.debug("#{__MODULE__} publishing: #{exchange} #{routing_key}, #{payload}")
     adapter.publish(channel, exchange, routing_key, payload, opts)
+    event
   end
 
   defp publish_effects(_, _, _, []) do
