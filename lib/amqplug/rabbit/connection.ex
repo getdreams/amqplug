@@ -20,7 +20,7 @@ defmodule Amqplug.Rabbit.Connection do
   def handle_info(:connect, {host, _, pipelines}) do
     case do_connect(host) do
       {:ok, connection} -> 
-        Logger.info("#{__MODULE__}: connected to broker at #{host}")
+        Logger.info("#{__MODULE__}: connected to broker")
         Process.monitor(connection.pid)
         setup_workers(connection, pipelines)
         {:noreply, {host, connection, pipelines}}
