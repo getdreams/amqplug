@@ -50,8 +50,6 @@ defmodule Amqplug.Rabbit.Worker do
 
   # remove?
   def handle_info(ref, state) do
-    IO.puts "Got into catch all function"
-    IO.inspect ref
     {:noreply, state}
   end
 end
