@@ -18,7 +18,7 @@ defmodule Amqplug.Rabbit.Worker do
     {:ok, %AMQP.Channel{pid: out_chan_pid} = out_chan} = Channel.open(conn)
     Process.monitor(in_chan_pid)
     Process.monitor(out_chan_pid)
-    Queue.declare(in_chan, queue_name, auto_delete: true)
+    Queue.declare(in_chan, queue_name, durable: true)
     Queue.bind(in_chan, queue_name, exchange, routing_key: routing_key)
     {:ok, _consumer_tag} = Basic.consume(in_chan, queue_name)
     {:noreply, {plug, queue, in_chan, out_chan}}
