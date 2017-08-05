@@ -24,7 +24,7 @@ defmodule Amqplug.Rabbit.Connection do
         Process.monitor(connection.pid)
         setup_workers(connection, pipelines)
         {:noreply, {host, connection, pipelines}}
-      error -> 
+      _error -> 
         Logger.warn("#{__MODULE__}: failed to connect to broker at #{host}. Retrying in: #{@reconnect_interval} ms")
         Process.send_after(self(), :connect, @reconnect_interval)
         {:noreply, {host, nil, pipelines}}
@@ -47,5 +47,9 @@ defmodule Amqplug.Rabbit.Connection do
     AMQP.Connection.open(host)
     rescue
     error -> {:error, error} 
+  end
+
+  def terminate(_, {_, conn, _}) do
+    AMQP.Connection.close(conn)
   end
 end
