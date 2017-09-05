@@ -14,13 +14,15 @@ defmodule Amqplug.Event do
 
   alias Amqplug.Event
 
-  def send_ack(%Event{adapter: adapter, in_channel: channel, delivery_tag: delivery_tag} = event) do
+  def send_ack(%Event{adapter: adapter, in_channel: channel, delivery_tag: delivery_tag, payload: payload, exchange: exchange, routing_key: routing_key} = event) do
     {:ok, _} = adapter.ack(channel, delivery_tag)
+    Logger.info("#{__MODULE__} received: #{exchange} #{routing_key}, #{payload}")
     %{event | state: :acked}
   end
 
-  def send_nack(%Event{adapter: adapter, in_channel: channel, delivery_tag: delivery_tag} = event) do
+  def send_nack(%Event{adapter: adapter, in_channel: channel, delivery_tag: delivery_tag, payload: payload, exchange: exchange, routing_key: routing_key} = event) do
     {:ok, _} = adapter.nack(channel, delivery_tag)
+    Logger.info("#{__MODULE__} received: #{exchange} #{routing_key}, #{payload}")
     %{event | state: :nacked}
   end
 
@@ -36,10 +38,9 @@ defmodule Amqplug.Event do
     %{event | out_channel: channel}
   end
 
-  def decode_json_payload(%Amqplug.Event{payload: payload, exchange: exchange, routing_key: routing_key} = event) do
+  def decode_json_payload(%Amqplug.Event{payload: payload} = event) do
     case Poison.decode(payload) do
       {:ok, parsed} ->
-        Logger.info("#{__MODULE__} received: #{exchange} #{routing_key}, #{parsed}")
         %{event | payload: parsed}
       _ ->
         %{event | payload: payload}
