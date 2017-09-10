@@ -26,7 +26,7 @@ defmodule Amqplug.Mixfile do
   defp deps do
     [
       {:amqp, "~> 0.2.1"}, 
-      {:poison, "~> 3.1"},
+      {:poison, "~> 2.0"},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false}
     ]
   end
