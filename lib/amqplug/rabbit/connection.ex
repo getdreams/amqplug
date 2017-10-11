@@ -12,6 +12,10 @@ defmodule Amqplug.Rabbit.Connection do
     start_link({host, nil, pipelines})
   end
 
+  def add_worker(pipeline) do
+    GenServer.cast(__MODULE__, {:add_worker, pipeline})
+  end
+
   def init({_, conn, _} = state) do
     if !conn, do: send(self(), :connect)
     {:ok, state}
@@ -57,5 +61,11 @@ defmodule Amqplug.Rabbit.Connection do
     AMQP.Connection.close(connection)
     GenServer.stop(self())
     # {:noreply, state}
+  end
+
+  def handle_cast({:add_worker, pipeline}, {_, connection, _} = state) do
+    {:ok, listener_pid} = Amqplug.Rabbit.Worker.start_link(connection, pipeline)
+    Process.link(listener_pid)
+    {:noreply, state}
   end
 end
