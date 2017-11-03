@@ -32,7 +32,15 @@ defmodule Amqplug.Rabbit.Worker do
     Process.monitor(out_chan_pid)
 
     Queue.declare(in_chan, queue_name, durable: true)
-    Queue.bind(in_chan, queue_name, exchange, routing_key: routing_key)
+    cond do
+      is_list(routing_key) ->
+        routing_key
+        |> Enum.each(fn key ->
+          Queue.bind(in_chan, queue_name, exchange, routing_key: key)
+        end)
+      true ->
+        Queue.bind(in_chan, queue_name, exchange, routing_key: routing_key)
+    end
     {:ok, _consumer_tag} = Basic.consume(in_chan, queue_name)
 
     case plug.init(plug_init) do
