@@ -14,7 +14,7 @@ defmodule Amqplug.Testplug do
     |> publish_single({"futures.list", "single with header", headers: [{"reference", "ref"}] })
 
     :timer.sleep(1000)
-    
+
     event
     |> publish_single({"futures.list", "single with two headers", headers: [{"reference", "ref"}, {"key", "val"}] })
 
