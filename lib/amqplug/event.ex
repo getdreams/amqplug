@@ -16,13 +16,11 @@ defmodule Amqplug.Event do
 
   def send_ack(%Event{adapter: adapter, in_channel: channel, delivery_tag: delivery_tag, payload: payload, exchange: exchange, routing_key: routing_key} = event) do
     {:ok, _} = adapter.ack(channel, delivery_tag)
-    Logger.info("#{__MODULE__} received: #{exchange} #{routing_key}, #{payload}")
     %{event | state: :acked}
   end
 
   def send_nack(%Event{adapter: adapter, in_channel: channel, delivery_tag: delivery_tag, payload: payload, exchange: exchange, routing_key: routing_key} = event) do
     {:ok, _} = adapter.nack(channel, delivery_tag)
-    Logger.info("#{__MODULE__} received: #{exchange} #{routing_key}, #{payload}")
     %{event | state: :nacked}
   end
 
@@ -47,8 +45,8 @@ defmodule Amqplug.Event do
     end
   end
 
-  def log_inbound(%Amqplug.Event{payload: payload} = event) do
-    Logger.info("#{inspect payload}")
+  def log_inbound(%Amqplug.Event{exchange: exchange, routing_key: routing_key, payload: payload} = event) do
+    Logger.info("#{__MODULE__} received: #{exchange} #{routing_key}, #{payload}")
     event
   end
 
@@ -58,13 +56,11 @@ defmodule Amqplug.Event do
   end
 
   def publish_single(%Event{adapter: adapter, out_channel: channel, exchange: exchange} = event, {routing_key, payload}) do
-    Logger.info("#{__MODULE__} publishing: #{exchange} #{routing_key}, #{payload}")
     adapter.publish(channel, exchange, routing_key, payload)
     event
   end
 
   def publish_single(%Event{adapter: adapter, out_channel: channel, exchange: exchange} = event, {routing_key, payload, opts}) do
-    Logger.info("#{__MODULE__} publishing: #{exchange} #{routing_key}, #{payload}")
     adapter.publish(channel, exchange, routing_key, payload, opts)
     event
   end
@@ -75,11 +71,9 @@ defmodule Amqplug.Event do
   defp publish_effects(adapter, channel, exchange, [ head | tail ]) do
     case head do
       {routing_key, payload} -> 
-        Logger.info("#{__MODULE__} publishing: #{exchange} #{routing_key}, #{payload}")
         adapter.publish(channel, exchange, routing_key, payload)
         publish_effects(adapter, channel, exchange, tail)
       {routing_key, payload, opts} -> 
-        Logger.info("#{__MODULE__} publishing: #{exchange} #{routing_key}, #{payload}")
         adapter.publish(channel, exchange, routing_key, payload, opts)
         publish_effects(adapter, channel, exchange, tail)
     end
