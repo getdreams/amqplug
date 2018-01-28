@@ -3,13 +3,15 @@ defmodule Amqplug.Debug do
   use AMQP
 
   def new_debug_channel do
-    case Connection.open(Amqplug.Config.host) do
+    case Connection.open(Amqplug.Config.host()) do
       {:ok, conn} ->
         case Channel.open(conn) do
           {:ok, %AMQP.Channel{} = chan} -> {conn, chan}
           err -> err
         end
-      err -> err
+
+      err ->
+        err
     end
   end
 

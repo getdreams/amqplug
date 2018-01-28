@@ -21,11 +21,12 @@ use Mix.Config
 #     config :logger, level: :info
 #
 config :amqplug, host: "amqp://guest:guest@localhost"
-config :amqplug, routes:
-[
-  {{"world", "test_queue_one", "router_one"}, Amqplug.Testplug},
-  {{"world", "test_queue_two", "router_two"}, Amqplug.Testplug}
-]
+
+config :amqplug,
+  routes: [
+    {{"world", "test_queue_one", "router_one"}, Amqplug.Testplug},
+    {{"world", "test_queue_two", "router_two"}, Amqplug.Testplug}
+  ]
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment

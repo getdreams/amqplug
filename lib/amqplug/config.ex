@@ -1,7 +1,7 @@
 defmodule Amqplug.Config do
   def host() do
     case Application.fetch_env(:amqplug, :host) do
-      {:ok, host} -> host 
+      {:ok, host} -> host
       _ -> nil
     end
   end

@@ -1,4 +1,4 @@
-#more complicated logic here in teh future
+# more complicated logic here in teh future
 defmodule Amqplug.EventDispatcher do
   use GenServer
 
