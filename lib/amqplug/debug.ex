@@ -26,7 +26,7 @@ defmodule Amqplug.Debug do
     Basic.publish(channel, exchange, routing_key, payload)
   end
 
-  def publish({_con, channel}, {routing_key, payload, opts}) do
+  def publish({_con, channel}, {routing_key, payload}, opts) do
     exchange = "world"
     Logger.debug("#{__MODULE__} publishing: #{exchange} #{routing_key}, #{payload}")
     Basic.publish(channel, exchange, routing_key, payload, opts)
