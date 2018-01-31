@@ -44,6 +44,8 @@ defmodule Amqplug.Rabbit.Connection do
     {:stop, {:connection_lost, reason}, state}
   end
 
+  defp setup_workers(_, nil), do: nil
+
   defp setup_workers(connection, pipelines) do
     Enum.each(pipelines, fn pipeline ->
       {:ok, listener_pid} = Amqplug.Rabbit.Worker.start_link(connection, pipeline)
