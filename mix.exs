@@ -11,7 +11,7 @@ defmodule Amqplug.Mixfile do
         "A specification and conveniences for composable " <>
           "modules for rabbitmq micro services. Inspired by Plug",
       version: @version,
-      elixir: "~> 1.4",
+      elixir: ">= 1.6.0",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -29,7 +29,7 @@ defmodule Amqplug.Mixfile do
   defp deps do
     [
       {:amqp, "~> 0.2.1"},
-      {:poison, "~> 2.0"},
+      {:poison, "~> 3.1"},
       {:credo, "~> 0.8", only: [:dev, :test], runtime: false}
     ]
   end
